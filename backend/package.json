@@ -10,12 +10,13 @@
     "dev": "nodemon src/app.js",
     "start": "node src/app.js",
     "prod": "pm2 src/app.js",
-
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "http-status": "^2.1.0",
     "mongodb": "^6.13.1",
