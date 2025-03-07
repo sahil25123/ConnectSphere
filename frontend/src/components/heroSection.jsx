@@ -36,7 +36,9 @@ function HeroSection() {
 
         <Button variant="outline" size="lg" className="group border-primary/30 hover:border-primary/60 transition-all">
           <UserPlus className="mr-2 h-5 w-5 group-hover:text-primary transition-colors" />
-          Sign Up
+          Sign Up     
+
+          
         </Button>
       </div>
 
