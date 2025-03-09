@@ -5,7 +5,8 @@ import "./index.css";  // Ensure this points to your Tailwind CSS file
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 
 import LandingPage from './pages/landing'
-import Test_page from './pages/test_page'
+import Authentication from './pages/Authentication'
+import { ForgotPasswordForm } from './components/forgot-password-form';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -16,6 +17,8 @@ function App() {
       <Routes>
         
         <Route path="/" element={<LandingPage/>}/>
+        <Route path ="/auth" element={<Authentication/>}/>
+        <Route path ="/forgot-password" element={<ForgotPasswordForm/>}/>
 
 
       </Routes>
