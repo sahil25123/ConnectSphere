@@ -60,13 +60,13 @@ export function ParticleBackground() {
               value: 80,
             },
             opacity: {
-              value: 0.3,
+              value: 0.5,
             },
             shape: {
               type: "circle",
             },
             size: {
-              value: { min: 1, max: 3 },
+              value: { min: 1, max: 5 },
             },
           },
           detectRetina: true,

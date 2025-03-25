@@ -1,8 +1,4 @@
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 
 body {
     margin: 0;
@@ -15,10 +11,6 @@ body {
   code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
   }
-  
-
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -70,7 +62,7 @@ body {
 
 body {
   background-color: hsl(var(--background));
-  color: hsl(var(--foreground) / 80%); /* Darker Text */
+  color: hsl(var(--foreground) / 70%); /* Darker Text */
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
