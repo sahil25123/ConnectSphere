@@ -25,6 +25,11 @@ app.get("/", (req, res) => {
     res.send("Server is ready");
 });
 
+
+app.get("api/v1/users/me", (req, res) => {
+    res.send("Server is ready this is the page after login ");
+});
+
 app.use("/api/v1/users", userRoutes);
 
 // MongoDB Connection

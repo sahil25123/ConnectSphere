@@ -1,14 +1,12 @@
-"use client"
-
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ParticleBackground } from "../components/particle-background"
-import { ThemeProvider } from "../components/theme-provider"
-import { ThemeModeToggle } from "../components/theme-mode-toggle"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Checkbox } from "../components/ui/checkbox"
-import { Label } from "../components/ui/label"
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ParticleBackground } from "../components/particle-background";
+import { ThemeProvider } from "../components/theme-provider";
+import { ThemeModeToggle } from "../components/theme-mode-toggle";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Checkbox } from "../components/ui/checkbox";
+import { Label } from "../components/ui/label";
 import {
   Video,
   ArrowLeft,
@@ -17,37 +15,92 @@ import {
   User,
   Eye,
   EyeOff,
-} from "lucide-react"
-import Link from "next/link"
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true)
-  const [showPassword, setShowPassword] = useState(false)
+  const { handleRegister, handleLogin, isLoading } = useAuth();
+  const navigate = useNavigate();
+  
+  const [isLogin, setIsLogin] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     rememberMe: false,
     agreeToTerms: false,
-  })
+  });
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
-    }))
-  }
+    }));
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log("Form submitted:", formData)
-    // Here you would typically handle authentication
-  }
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      setError('Email and password are required');
+      return false;
+    }
+
+    if (!isLogin) {
+      if (!formData.name) {
+        setError('Name is required');
+        return false;
+      }
+      if (formData.password.length < 8) {
+        setError('Password must be at least 8 characters');
+        return false;
+      }
+      if (!formData.agreeToTerms) {
+        setError('You must agree to the terms and conditions');
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setOpen(false);
+
+    if (!validateForm()) {
+      setOpen(true);
+      return;
+    }
+
+    try {
+      if (isLogin) {
+        await handleLogin(formData.email, formData.password);
+      } else {
+        await handleRegister(
+          formData.name,
+          formData.email,
+          formData.email,
+          formData.password
+        );
+      }
+    } catch (err) {
+      setError(err.message || "Authentication failed");
+      setOpen(true);
+    }
+  };
 
   const toggleView = () => {
-    setIsLogin(!isLogin)
-  }
+    setIsLogin(!isLogin);
+    setError("");
+    setOpen(false);
+  };
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="connectsphere-theme">
@@ -59,7 +112,7 @@ export default function AuthPage() {
         </div>
 
         <div className="container mx-auto px-4 relative z-10 flex flex-col items-center justify-center min-h-screen py-12">
-          <Link href="/" className="absolute top-4 left-4 text-muted-foreground hover:text-primary transition-colors">
+          <Link to="/" className="absolute top-4 left-4 text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="h-6 w-6" />
             <span className="sr-only">Back to home</span>
           </Link>
@@ -162,7 +215,7 @@ export default function AuthPage() {
                     <div className="flex justify-between">
                       <Label htmlFor="password">Password</Label>
                       {isLogin && (
-                        <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                        <Link to="/forgot-password" className="text-xs text-primary hover:underline">
                           Forgot password?
                         </Link>
                       )}
@@ -187,6 +240,39 @@ export default function AuthPage() {
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+                    {!isLogin && (
+                      <div className="mt-1">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4].map((i) => (
+                            <div
+                              key={i}
+                              className={`h-1 flex-1 rounded-sm ${
+                                formData.password.length >= i * 2
+                                  ? i <= 2
+                                    ? 'bg-red-500'
+                                    : i === 3
+                                    ? 'bg-yellow-500'
+                                    : 'bg-green-500'
+                                  : 'bg-gray-200'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formData.password.length > 0
+                            ? `Password strength: ${
+                                formData.password.length < 4
+                                  ? 'Weak'
+                                  : formData.password.length < 8
+                                  ? 'Fair'
+                                  : formData.password.length < 12
+                                  ? 'Good'
+                                  : 'Strong'
+                              }`
+                            : ''}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {isLogin ? (
@@ -218,11 +304,11 @@ export default function AuthPage() {
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         I agree to the{" "}
-                        <Link href="/terms" className="text-primary hover:underline">
+                        <Link to="/terms" className="text-primary hover:underline">
                           Terms of Service
                         </Link>{" "}
                         and{" "}
-                        <Link href="/privacy" className="text-primary hover:underline">
+                        <Link to="/privacy" className="text-primary hover:underline">
                           Privacy Policy
                         </Link>
                       </Label>
@@ -232,8 +318,21 @@ export default function AuthPage() {
                   <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-500 transition-all duration-300 shadow-glow"
+                    disabled={isLoading}
                   >
-                    {isLogin ? "Sign In" : "Create Account"}
+                    {isLoading ? (
+                      <span className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </span>
+                    ) : isLogin ? (
+                      "Sign In"
+                    ) : (
+                      "Create Account"
+                    )}
                   </Button>
 
                   <p className="text-center text-sm text-muted-foreground mt-6">
@@ -248,7 +347,17 @@ export default function AuthPage() {
           </motion.div>
         </div>
       </div>
-    </ThemeProvider>
-  )
-}
 
+      <Snackbar
+        open={open}
+        autoHideDuration={5000}
+        onClose={() => setOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setOpen(false)} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
+    </ThemeProvider>
+  );
+}
