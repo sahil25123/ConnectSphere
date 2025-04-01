@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { use } from 'react'
 
 import { useState, useRef, useEffect } from 'react'
 
 import "../styles/VideoMeet.css"
-import { TextField } from '@mui/material'
+import { TextField ,Button } from '@mui/material'
 
 
 const  server_url  ="http://localhost:5000/api/v1/users/me";
@@ -54,6 +54,44 @@ export default function VideoMeet() {
            
         ]
     }
+    const getPermissions= async()=>{
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
+        });
+        localVideoRef.current.srcObject = stream;
+        setVideoAvailable(true);
+        setAudioAvailable(true);
+        setVideo(true);
+        setAudio(true);
+
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: true
+        });
+        setScreenAvailable(true);
+        setScreenShare(true);
+        setScreenShare(screenStream);
+      
+
+      }
+      catch(err){
+        console.log(err);
+        setVideoAvailable(false);
+        setAudioAvailable(false);
+        setVideo(false);
+        setAudio(false);
+        setScreenAvailable(false);
+        setScreenShare(false);
+      }
+    }
+
+    useEffect(()=>{
+      getPermissions();
+
+
+    },[])
   return (
     <div>
       <h1>Video Meet</h1>
@@ -62,9 +100,13 @@ export default function VideoMeet() {
       <div>
 
       <h2>Enter into Lobby</h2>
-      <TextField id="outlined-basic" label="Username" variant="outlined"  onChange= {(e)=>{setUsername(e.target.value)}}/>
+      <TextField id="outlined-basic" label="Username"  value={username} variant="outlined"  onChange= {(e)=>{setUsername(e.target.value)}}/>
+      <Button variant="contained">Join</Button>
 
+      <div>
+        <video ref={localVideoRef} autoPlay muted></video>
 
+      </div>
 
 
 
