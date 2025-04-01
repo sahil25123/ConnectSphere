@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   const handleLogin = async (username, password) => {
     try {
       setIsLoading(true);
-      const response = await client.post("/login", {
+      const response = await client.post("/auth", {
         username,
         password,
       });
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
     delete client.defaults.headers.common["Authorization"];
     setUserData(null);
     setIsAuthenticated(false);
-    navigate("/login");
+    navigate("/auth");
   };
 
   const value = {

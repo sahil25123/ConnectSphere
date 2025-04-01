@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';  // Import AuthProvider
 import LandingPage from './pages/landing'
 import Authentication from './pages/Authentication'
 import { ForgotPasswordForm } from './components/forgot-password-form';
+import VideoMeet from './pages/VideoMeet';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -17,6 +18,8 @@ function App() {
           <Route path="/" element={<LandingPage/>}/>
           <Route path="/auth" element={<Authentication/>}/>
           <Route path="/forgot-password" element={<ForgotPasswordForm/>}/>
+          <Route path ="/:url" element={<VideoMeet/>}/>
+
         </Routes>
       </AuthProvider>
     </Router>

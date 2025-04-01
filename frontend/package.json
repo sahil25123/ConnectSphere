@@ -13,7 +13,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.6",
-    "@mui/material": "^6.4.6",
+    "@mui/material": "^6.4.10",
     "@radix-ui/themes": "^3.2.1",
     "@tailwindcss/postcss": "^4.0.12",
     "@tailwindcss/vite": "^4.0.11",
