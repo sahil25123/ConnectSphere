@@ -16,7 +16,7 @@ const connectToSocket = (server) => {
         console.log(`User Connected: ${socket.id}`);
 
         // User joins a call
-        socket.on("accept-call", (room) => {
+        socket.on("join-call", (room) => {
             if (!connections[room]) {
                 connections[room] = [];
             }
