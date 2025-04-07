@@ -1,117 +1,93 @@
-import React, { use } from 'react'
+import { useState, useRef, useEffect } from 'react';
+import "../styles/VideoMeet.css";
+import { TextField, Button } from '@mui/material';
 
-import { useState, useRef, useEffect } from 'react'
+const server_url = "http://localhost:5000/api/v1/users/me";
 
-import "../styles/VideoMeet.css"
-import { TextField ,Button } from '@mui/material'
-
-
-const  server_url  ="http://localhost:5000/api/v1/users/me";
 export default function VideoMeet() {
-  var socketRef= useRef();
-  let socketIdRef= useRef();
+  const localVideoRef = useRef();
 
-  let localVideoRef= useRef();
+  const [videoAvailable, setVideoAvailable] = useState(true);
+  const [audioAvailable, setAudioAvailable] = useState(true);
 
-  let [videoAvailable, setVideoAvailable]= useState(true);
-  let [audioAvailable, setAudioAvailable]= useState(true);
+  const [video, setVideo] = useState(false);
+  const [audio, setAudio] = useState(false);
 
-  let [video, setVideo]= useState(false);
-  let [audio, setAudio]= useState(false);
+  const [screenAvailable, setScreenAvailable] = useState(false);
+  const [screenStream, setScreenStream] = useState(null);
 
-  let[screenShare, setScreenShare]= useState(false);
-  let [showModal, setShowModal]= useState(false);
+  const [askforUsername, setAskforUsername] = useState(true);
+  const [username, setUsername] = useState("");
 
-  let [ screenAvailable, setScreenAvailable]= useState(false);
-  let [message, setMessage]= useState("");
+  const getPermissions = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
 
-  let [messageList, setMessageList]= useState([]);
-  let [messageText, setMessageText]= useState("");
+      localVideoRef.current.srcObject = stream;
+      setVideoAvailable(true);
+      setAudioAvailable(true);
+      setVideo(true);
+      setAudio(true);
 
-  let [askforUsername, setAskforUsername]= useState(true);
-  let [username, setUsername]= useState("");
-  let [userList, setUserList]= useState([]);
+      const displayStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+      });
 
-  const videoRef= useRef();
-
-  // if(isChrome()=== false){
-  //   alert("Please use Google Chrome for this application");
-  // }
-
-
-
-   
-
-  var connections = {};
-
-
-  // stun ser
-    const peerConfigConnection =  {
-        "iceServers": [
-            {
-                "urls": "stun:stun.l.google.com:19302"
-            }
-           
-        ]
+      setScreenAvailable(true);
+      setScreenStream(displayStream);
+    } catch (err) {
+      console.error(err);
+      setVideoAvailable(false);
+      setAudioAvailable(false);
+      setVideo(false);
+      setAudio(false);
+      setScreenAvailable(false);
+      setScreenStream(null);
     }
-    const getPermissions= async()=>{
-      try{
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true
-        });
-        localVideoRef.current.srcObject = stream;
-        setVideoAvailable(true);
-        setAudioAvailable(true);
-        setVideo(true);
-        setAudio(true);
+  };
 
-        const screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: true,
-          audio: true
-        });
-        setScreenAvailable(true);
-        setScreenShare(true);
-        setScreenShare(screenStream);
-      
+  useEffect(() => {
+    getPermissions();
+  }, []);
 
-      }
-      catch(err){
-        console.log(err);
-        setVideoAvailable(false);
-        setAudioAvailable(false);
-        setVideo(false);
-        setAudio(false);
-        setScreenAvailable(false);
-        setScreenShare(false);
-      }
+  const handleJoin = () => {
+    if (username.trim() !== "") {
+      setAskforUsername(false);
+      // You can initiate the socket connection here later
     }
+  };
 
-    useEffect(()=>{
-      getPermissions();
-
-
-    },[])
   return (
-    <div>
+    <div className="video-meet-container">
       <h1>Video Meet</h1>
-      
-      {askforUsername === true ?
-      <div>
 
-      <h2>Enter into Lobby</h2>
-      <TextField id="outlined-basic" label="Username"  value={username} variant="outlined"  onChange= {(e)=>{setUsername(e.target.value)}}/>
-      <Button variant="contained">Join</Button>
+      {askforUsername ? (
+        <div className="lobby-section">
+          <h2>Enter into Lobby</h2>
+          <TextField
+            id="outlined-basic"
+            label="Username"
+            variant="outlined"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{ marginBottom: "10px" }}
+          />
+          <br />
+          <Button variant="contained" onClick={handleJoin}>
+            Join
+          </Button>
 
-      <div>
-        <video ref={localVideoRef} autoPlay muted></video>
-
-      </div>
-
-
-
-      </div>: <></>   
-      }
+          <div className="local-video-preview">
+            <video ref={localVideoRef} autoPlay muted playsInline></video>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
-  )
+  );
 }

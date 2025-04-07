@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 
-app.get("api/v1/users/me", (req, res) => {
+app.get("/api/v1/users/me", (req, res) => {
     res.send("Server is ready this is the page after login ");
 });
 

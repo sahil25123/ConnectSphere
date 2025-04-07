@@ -37,18 +37,17 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const handleRegister = async (name, username, email, password) => {
+  const handleRegister = async (name, email, password) => {
     try {
       setIsLoading(true);
       const response = await client.post("/register", {
         name,
-        username,
         email,
         password,
       });
 
       if (response.status === httpStatus.CREATED) {
-        await handleLogin(username, password); // Auto-login after registration
+        await handleLogin(email, password); // Auto-login after registration
         return response.data.message;
       }
     } catch (err) {
@@ -58,11 +57,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (email, password) => {
     try {
       setIsLoading(true);
       const response = await client.post("/auth", {
-        username,
+        email,
         password,
       });
 

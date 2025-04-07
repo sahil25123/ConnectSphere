@@ -86,7 +86,6 @@ export default function AuthPage() {
         await handleRegister(
           formData.name,
           formData.email,
-          formData.email,
           formData.password
         );
       }
